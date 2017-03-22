@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:weightSum="1"
+    tools:context="com.example.android.voteforcolor.AssignAdmin">
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <SearchView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:id="@+id/searchView"
+        android:queryHint="Search"
+        android:iconifiedByDefault="false">
+        <requestFocus />
+    </SearchView>
+
+</RelativeLayout>
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="378dp"
+        android:layout_weight="0.33"
+        android:id="@+id/listView_users">
+
+    </ListView>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!--<Button-->
+            <!--android:text="Assign"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:id="@+id/assign"-->
+            <!--android:onClick="assign_admin"-->
+            <!--android:layout_toStartOf="@+id/button4"/>-->
+
+        <Button
+            android:text="Sign Out"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/button4"
+            android:onClick="exitApp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="12dp" />
+
+    </RelativeLayout>
+
+
+
+</LinearLayout>
