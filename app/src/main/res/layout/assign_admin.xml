@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:weightSum="1"
-    tools:context="com.example.android.voteforcolor.AssignAdmin">
+    tools:context="com.hpe.ipn.AssignAdmin">
 <RelativeLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content">

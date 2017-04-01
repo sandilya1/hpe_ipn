@@ -6,7 +6,7 @@
     android:orientation="vertical"
     android:padding="10dp"
     android:fillViewport="false"
-    tools:context="com.example.android.voteforcolor.PollsActivity">
+    tools:context="com.hpe.ipn.PollsActivity">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -23,6 +23,16 @@
             android:textSize="8pt"
             android:id="@+id/textView4" />
 
+        <TextView
+            android:text="Please Enter atleast 2 options Below"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="36dp"
+            android:id="@+id/textView6"
+            android:textSize="8pt"
+            android:layout_below="@+id/question"
+            android:layout_alignStart="@+id/question" />
+
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -34,15 +44,7 @@
             android:layout_below="@+id/textView4"
             android:layout_alignStart="@+id/textView4" />
 
-        <TextView
-            android:text="Please Enter atleast 2 options Below"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="36dp"
-            android:id="@+id/textView6"
-            android:textSize="8pt"
-            android:layout_below="@+id/question"
-            android:layout_alignStart="@+id/question" />
+
 
         <EditText
             android:layout_width="wrap_content"
@@ -90,17 +92,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/publish"
-            android:onClick="publish"
-            android:layout_alignBaseline="@+id/back"
-            android:layout_alignBottom="@+id/back"
-            android:layout_toEndOf="@+id/back" />
+            android:layout_alignBaseline="@+id/save"
+            android:layout_alignBottom="@+id/save"
+            android:layout_toEndOf="@+id/save" />
 
         <Button
             android:text="Sign Out"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/button"
-            android:onClick="exitApp"
             android:layout_alignBaseline="@+id/publish"
             android:layout_alignBottom="@+id/publish"
             android:layout_toEndOf="@id/publish"/>
@@ -109,8 +109,7 @@
             android:text="Lock"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/back"
-            android:onClick="save"
+            android:id="@+id/save"
             android:layout_below="@+id/op4"
             />
     </RelativeLayout>

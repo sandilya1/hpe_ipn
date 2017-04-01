@@ -1,9 +1,12 @@
 package com.hpe.ipn;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.StrictMode;
+import android.provider.ContactsContract;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -12,6 +15,14 @@ import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -23,48 +34,42 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 
-public class DisplayMessageActivity extends Activity {
+public class DisplayMessageActivity extends Activity implements View.OnClickListener {
 
 
 
     String Et_button1;
     private RadioGroup radioColorGroup;
     private RadioButton radioColorButton;
-    private Button vButton;
+    private Button vButton , signOut;
+    public static final String TAG = "MessageActivity.class";
     private TextView textView1;
     final int delay = 10000;
     int a = 0;
-
+    DatabaseReference databaseReference;
+    private  FirebaseAuth.AuthStateListener mAuthListener;
+    FirebaseAuth firebaseAuth;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display_message);
 
-        final Handler h = new Handler();
+        setPageContents("run");
 
-        final int post_delay = 60000;
-        h.postDelayed(new Runnable(){
-            public void run() {
-                String data_check = check_poll();
-                Log.i("DisplayMessageActivity.class", "run: "+ data_check);
-                if(a == 1){
-                    h.removeCallbacksAndMessages(this);
-                }else if(data_check.isEmpty()){
-                    h.postDelayed(this, delay);
-                    Log.i("DisplayMessageActivity.class", "run: not delayed");
-                    setPageContents(null);
-                }else{
-                    h.postDelayed(this, post_delay);
-                    Log.i("DisplayMessageActivity.class", "run: delayed");
-                    setPageContents(data_check);
-                }
-            }
-        },delay);
+        vButton = (Button)findViewById(R.id.vote);
+        signOut = (Button)findViewById(R.id.email_sign_out_button);
+        vButton.setOnClickListener(this);
+        signOut.setOnClickListener(this);
 
-        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-        StrictMode.setThreadPolicy(policy);
+        databaseReference = FirebaseDatabase.getInstance().getReference();
+
+//        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+//        StrictMode.setThreadPolicy(policy);
 
         RelativeLayout relativeLayout = (RelativeLayout) findViewById(R.id.activity_display_message);
 
@@ -77,77 +82,92 @@ public class DisplayMessageActivity extends Activity {
 
     }
 
-
         public void setPageContents(String check_poll){
 
-            RelativeLayout relativeLayout = (RelativeLayout) findViewById(R.id.activity_display_message);
+            final RelativeLayout relativeLayout = (RelativeLayout) findViewById(R.id.activity_display_message);
+
 //         relativeLayout.removeAllViewsInLayout();
 
 //        ViewGroup layout = (ViewGroup) findViewById(R.id.activity_display_message);
 //        layout.addView(textView);
+            final HashMap<String,Object> rm = new HashMap<>();
+            if(check_poll != null) {
+                final RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(
+                        RelativeLayout.LayoutParams.WRAP_CONTENT,
+                        RelativeLayout.LayoutParams.WRAP_CONTENT);
+                final RelativeLayout.LayoutParams newParams = new RelativeLayout.LayoutParams(
+                        RelativeLayout.LayoutParams.WRAP_CONTENT,
+                        RelativeLayout.LayoutParams.WRAP_CONTENT);
+                databaseReference = FirebaseDatabase.getInstance().getReference();
+                databaseReference.addValueEventListener(new ValueEventListener() {
+                    PublishQuestion publishQuestion = new PublishQuestion();
 
-            if(check_poll != null){
-                try {
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for (DataSnapshot child1 : dataSnapshot.getChildren()){
+                            publishQuestion.setQuestion_p(child1.child("question_p").getValue(String.class));
+                            publishQuestion.setOption1(child1.child("option1").getValue(String.class));
+                            publishQuestion.setOption2(child1.child("option2").getValue(String.class));
+                            publishQuestion.setOption3(child1.child("option3").getValue(String.class));
+                            publishQuestion.setOption4(child1.child("option4").getValue(String.class));
 
-                    JSONArray jsonArray = new JSONArray(check_poll);
+                            if(publishQuestion.getOption1() != null){
+                                rm.put("question_p",publishQuestion.getQuestion_p());
+                                rm.put("option1",publishQuestion.getOption1());
+                                rm.put("option2",publishQuestion.getOption2());
+                                rm.put("option3",publishQuestion.getOption3());
+                                rm.put("option4",publishQuestion.getOption4());
+                            }
+                        }
 
-                    RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(
-                            RelativeLayout.LayoutParams.WRAP_CONTENT,
-                            RelativeLayout.LayoutParams.WRAP_CONTENT);
-                    RelativeLayout.LayoutParams newParams = new RelativeLayout.LayoutParams(
-                            RelativeLayout.LayoutParams.WRAP_CONTENT,
-                            RelativeLayout.LayoutParams.WRAP_CONTENT);
+                        String a = rm.get("question_p").toString();
+                        String b = rm.get("option1").toString();
+                        String c = rm.get("option2").toString();
+                        String d = rm.get("option3").toString();
+                        String e = rm.get("option4").toString();
+
+                        if(a != null){
+                            int z =250;
+                            textView1 = new TextView(DisplayMessageActivity.this);
+                            layoutParams.addRule(RelativeLayout.BELOW,1);
+                            textView1.setLayoutParams(layoutParams);
+                            textView1.setText(a);
+                            textView1.setTextSize(20);
+                            textView1.setPadding(10, z, 40, 100);
+                            relativeLayout.addView(textView1);
+                            z += 100;
+                            radioColorGroup = new RadioGroup(DisplayMessageActivity.this);
+                            newParams.addRule(RelativeLayout.BELOW,1);
+                            radioColorGroup.setLayoutParams(newParams);
+                            RadioButton radioButton = new RadioButton(DisplayMessageActivity.this);
+                            radioButton.setText(b);
+                            radioColorGroup.setPadding(10,z,40,100);
+                            radioColorGroup.addView(radioButton);
+
+                            RadioButton radioButton1 = new RadioButton(DisplayMessageActivity.this);
+                            radioButton1.setText(c);
+                            radioColorGroup.addView(radioButton1);
+
+                            RadioButton radioButton2 = new RadioButton(DisplayMessageActivity.this);
+                            radioButton2.setText(d);
+                            radioColorGroup.addView(radioButton2);
+
+                            RadioButton radioButton3 = new RadioButton(DisplayMessageActivity.this);
+                            radioButton3.setText(e);
+                            radioColorGroup.addView(radioButton3);
+
+                            relativeLayout.addView(radioColorGroup);
+                        }
 
 
-                    for (int i = 0; i < jsonArray.length(); i++) {
-                        int a = 150;
-                        JSONObject jsonObject = jsonArray.getJSONObject(i);
-                        textView1 = new TextView(this);
-                        String question = String.valueOf(jsonObject.getString("question"));
-                        layoutParams.addRule(RelativeLayout.BELOW,1);
-                        textView1.setLayoutParams(layoutParams);
-                        textView1.setText(question);
-                        textView1.setTextSize(20);
-                        textView1.setPadding(10, a, 40, 100);
-                        relativeLayout.addView(textView1);
-                        a += 100;
-                        radioColorGroup = new RadioGroup(this);
-                        newParams.addRule(RelativeLayout.BELOW,1);
-                        radioColorGroup.setLayoutParams(newParams);
-                        RadioButton radioButton = new RadioButton(this);
-                        String op1 = String.valueOf(jsonObject.getString("option1"));
-                        radioButton.setText(op1);
-                        radioColorGroup.setPadding(10,a,40,100);
-                        radioColorGroup.addView(radioButton);
-
-                        RadioButton radioButton1 = new RadioButton(this);
-                        String op2 = String.valueOf(jsonObject.getString("option2"));
-                        radioButton1.setText(op2);
-                        radioColorGroup.addView(radioButton1);
-
-                        RadioButton radioButton2 = new RadioButton(this);
-                        String op3 = String.valueOf(jsonObject.getString("option3"));
-                        radioButton2.setText(op3);
-                        radioColorGroup.addView(radioButton2);
-
-                        RadioButton radioButton3 = new RadioButton(this);
-                        String op4 = String.valueOf(jsonObject.getString("option4"));
-                        radioButton3.setText(op4);
-                        radioColorGroup.addView(radioButton3);
-
-                        relativeLayout.addView(radioColorGroup);
-
-                        a += 100;
                     }
 
-                } catch (Exception e) {
-                    Log.e("DisplayMessageActivity.class", "onCreate: " + e);
-                }
-            }else{
-                relativeLayout.removeView(textView1);
-                relativeLayout.removeView(radioColorGroup);
-            }
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
 
+                    }
+                });
+
+            }
         }
 
 //        radioColorGroup = (RadioGroup) findViewById(R.id.radioGroup);
@@ -168,61 +188,68 @@ public class DisplayMessageActivity extends Activity {
 //        });
 //    }
 
-    public void vote(View view){
-        Log.i("DisplayMessageActivity.class", "inside Vote Method");
+
+    @Override
+    public void onClick(View v) {
+        if(v == signOut){
+            a=1;
+            finish();
+        }else if(v == vButton){
+            Log.i("MessageActivity.class", "inside Vote Method");
 
 //        int selectId = -1;
-        int selectId = radioColorGroup.getCheckedRadioButtonId();
-        Log.i("DisplayMessageActivity.class", "Selected ID: "+ selectId);
-        if(selectId == -1){
-            Toast.makeText(getApplicationContext(),"Please Choose an option",Toast.LENGTH_LONG).show();
-        }else{
-            radioColorButton=(RadioButton)findViewById(selectId);
-            String method = "vote" ;
-            String user = MainActivity.user_name ;
-            String voteFor = radioColorButton.getText().toString();
-            VotingTask vTask = new VotingTask(this);
-            vTask.execute(method,user,voteFor);
+            int selectId = radioColorGroup.getCheckedRadioButtonId();
+            Log.i("MessageActivity.class", "Selected ID: "+ selectId);
+            if(selectId == -1){
+                Toast.makeText(getApplicationContext(),"Please Choose an option",Toast.LENGTH_LONG).show();
+            }else{
+                FirebaseUser firebaseUser = firebaseAuth.getInstance().getCurrentUser();
+                radioColorButton=(RadioButton)findViewById(selectId);
+                final String current_user = firebaseUser.getUid();
+                Log.i("MessageActivity.class", "voteFor"+ current_user);
+                final String voteFor = radioColorButton.getText().toString();
+                Log.i("MessageActivity.class", "voteFor"+ voteFor);
+
+                final List<String> u_id = new ArrayList<String>();
+                databaseReference = FirebaseDatabase.getInstance().getReference();
+                databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        Log.i("MessageActivity.class", "datasnap ");
+                        for(DataSnapshot ds : dataSnapshot.getChildren()){
+                            UserInfo userInfo = new UserInfo();
+                            userInfo.setUserId(ds.child(current_user).child("uid").getValue(String.class));
+                            Log.i("MessageActivity.class", "1datasnap "+userInfo.getUserId());
+
+                            String user_infp = userInfo.getUserId();
+                            if(user_infp != null && user_infp.equalsIgnoreCase(current_user)){
+                                u_id.add(userInfo.getUserId());
+                                Log.i(TAG,"USerID"+ userInfo.getUserId());
+                                Toast.makeText(DisplayMessageActivity.this,"Already Voted..",Toast.LENGTH_LONG).show();
+                                startActivity(new Intent(getApplicationContext(),ResultsActivity.class));
+                                return;
+                            }else{
+                                VoteInfo voteInfo = new VoteInfo(current_user,voteFor);
+                                databaseReference = FirebaseDatabase.getInstance().getReference();
+                                databaseReference.child("Voting").child(current_user).setValue(voteInfo);
+                                Toast.makeText(DisplayMessageActivity.this,"Thank you for voting",Toast.LENGTH_LONG).show();
+                                startActivity(new Intent(getApplicationContext(),ResultsActivity.class));
+                                return;
+                            }
+                        }
+                    }
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
+
+//            VotingTask vTask = new VotingTask(this);
+//            vTask.execute(method,user,voteFor);
+
+
+            }
         }
 
-
     }
-
-    public void exitApp(View view){
-        a=1;
-        finish();
-
-    }
-
-    public String check_poll(){
-                String poll_check_url = "http://10.0.2.2:1202/webApp/poll_check.php";
-                try {
-                    URL url = new URL(poll_check_url);
-                    HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
-                    httpURLConnection.setRequestMethod("POST");
-                    httpURLConnection.setDoOutput(true);
-                    httpURLConnection.setDoInput(true);
-                    InputStream inputStream = httpURLConnection.getInputStream();
-                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream,"iso-8859-1"),8);
-                    StringBuilder stringBuilder = new StringBuilder();
-                    String response = "" , line = "";
-                    while((line=bufferedReader.readLine()) != null ){
-                        response += line ;
-                        stringBuilder.append(line + "\n");
-                      //  Log.i("BackgroundTask.class", "doInBackground: "+response);
-                    }
-                    bufferedReader.close();
-                    inputStream.close();
-                    httpURLConnection.disconnect();
-                    return stringBuilder.toString();
-
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-        return null;
-    }
-
-
 }
