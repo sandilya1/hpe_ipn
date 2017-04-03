@@ -8,8 +8,8 @@ apply plugin: 'com.google.gms.google-services'
         applicationId "com.hpe.ipn"
         minSdkVersion 19
         targetSdkVersion 25
-        versionCode 3
-        versionName "1.2"
+        versionCode 4
+        versionName "1.3"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

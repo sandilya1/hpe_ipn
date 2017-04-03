@@ -1,6 +1,7 @@
 package com.hpe.ipn;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -52,8 +53,10 @@ public class DisplayMessageActivity extends Activity implements View.OnClickList
     final int delay = 10000;
     int a = 0;
     DatabaseReference databaseReference;
+    ProgressDialog progressDialog;
     private  FirebaseAuth.AuthStateListener mAuthListener;
     FirebaseAuth firebaseAuth;
+    Button b1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,10 +64,16 @@ public class DisplayMessageActivity extends Activity implements View.OnClickList
 
         setPageContents("run");
 
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Loading Page..");
+        progressDialog.show();
+
         vButton = (Button)findViewById(R.id.vote);
         signOut = (Button)findViewById(R.id.email_sign_out_button);
         vButton.setOnClickListener(this);
         signOut.setOnClickListener(this);
+        b1 = (Button)findViewById(R.id.refresh_page);
+        b1.setOnClickListener(this);
 
         databaseReference = FirebaseDatabase.getInstance().getReference();
 
@@ -125,8 +134,11 @@ public class DisplayMessageActivity extends Activity implements View.OnClickList
                         String d = rm.get("option3").toString();
                         String e = rm.get("option4").toString();
 
-                        if(a != null){
+                        Log.i(TAG, "onDataChange: String a"+ a);
+
+                        if(a != null && a.length() != 0){
                             int z =250;
+                            progressDialog.dismiss();
                             textView1 = new TextView(DisplayMessageActivity.this);
                             layoutParams.addRule(RelativeLayout.BELOW,1);
                             textView1.setLayoutParams(layoutParams);
@@ -156,6 +168,21 @@ public class DisplayMessageActivity extends Activity implements View.OnClickList
                             radioColorGroup.addView(radioButton3);
 
                             relativeLayout.addView(radioColorGroup);
+                        }else if(a.isEmpty()){
+                            progressDialog.dismiss();
+                            int z = 250;
+                            textView1 = new TextView(DisplayMessageActivity.this);
+                            layoutParams.addRule(RelativeLayout.BELOW,1);
+                            textView1.setLayoutParams(layoutParams);
+                            textView1.setText("No Question to display, Please try refreshing the page");
+                            textView1.setTextSize(20);
+                            textView1.setPadding(10,z,40,100);
+                            relativeLayout.addView(textView1);
+
+
+                        }else{
+                            progressDialog.dismiss();
+                            Log.e(TAG,"Something went wrong with Loading..");
                         }
 
 
@@ -194,6 +221,10 @@ public class DisplayMessageActivity extends Activity implements View.OnClickList
         if(v == signOut){
             a=1;
             finish();
+        }else if(v == b1){
+            Intent intent = getIntent();
+            finish();
+            startActivity(intent);
         }else if(v == vButton){
             Log.i("MessageActivity.class", "inside Vote Method");
 
