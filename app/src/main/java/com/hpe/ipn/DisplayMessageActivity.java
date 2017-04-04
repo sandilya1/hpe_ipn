@@ -4,10 +4,6 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.StrictMode;
-import android.provider.ContactsContract;
-import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -25,16 +21,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -57,6 +43,7 @@ public class DisplayMessageActivity extends Activity implements View.OnClickList
     private  FirebaseAuth.AuthStateListener mAuthListener;
     FirebaseAuth firebaseAuth;
     Button b1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -273,11 +260,6 @@ public class DisplayMessageActivity extends Activity implements View.OnClickList
 
                     }
                 });
-
-
-//            VotingTask vTask = new VotingTask(this);
-//            vTask.execute(method,user,voteFor);
-
 
             }
         }

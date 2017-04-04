@@ -17,6 +17,7 @@ import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.formatter.LargeValueFormatter;
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.firebase.database.DataSnapshot;
@@ -97,7 +98,8 @@ public class ResultsActivity extends Activity {
                 if (exp_res.isEmpty()){
                     Toast.makeText(getApplicationContext(),"No Result",Toast.LENGTH_LONG).show();
                 }else{
-                    Toast.makeText(getApplicationContext(),exp_res,Toast.LENGTH_LONG).show();
+//                    Toast.makeText(getApplicationContext(),exp_res,Toast.LENGTH_LONG).show();
+                    Log.i("ResultsActivity.class","msg and exp is not empty "+exp_res);
                 }
 
             }
@@ -190,14 +192,16 @@ public class ResultsActivity extends Activity {
         xAxis.setEnabled(true);
         xAxis.disableGridDashedLine();
         xAxis.setDrawGridLines(false);
-
         xAxis.setAvoidFirstLastClipping(true);
         xAxis.setLabelCount(4);
         xAxis.setAxisMinimum(0);
 
         YAxis leftAxis = barChart.getAxisLeft();
         leftAxis.setTextColor(ColorTemplate.getHoloBlue());
-        leftAxis.setAxisMinimum(0);
+
+        LargeValueFormatter y = new LargeValueFormatter();
+        leftAxis.setAxisMinimum(y.getDecimalDigits());
+
         leftAxis.setDrawGridLines(true);
 
         YAxis rightAxis = barChart.getAxisRight();
@@ -218,7 +222,7 @@ public class ResultsActivity extends Activity {
         // barChart.setDescription("Set Bar Chart Description");
 
         bardataset.setColors(ColorTemplate.COLORFUL_COLORS);
-        bardataset.setLabel("Vote");
+//        bardataset.setLabel("Vote"); //is displayed in legend
 
 
         return "Success";
