@@ -1,6 +1,7 @@
 package com.hpe.ipn;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -50,14 +51,15 @@ import java.util.Set;
 public class ResultsActivity extends Activity {
 
     DatabaseReference databaseReference;
+    ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_results);
 
-        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-        StrictMode.setThreadPolicy(policy);
+//        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+//        StrictMode.setThreadPolicy(policy);
 
         Log.i("ResultsActivity.class", "doInBackground: Results In Progress");
         final String app_result;
@@ -153,6 +155,9 @@ public class ResultsActivity extends Activity {
         BarChart barChart = (BarChart) findViewById(R.id.barchart);
         ArrayList<BarEntry> entries = new ArrayList<>();
         JSONArray jsonArray = null;
+        progressDialog=new ProgressDialog(this);
+        progressDialog.setMessage("Loading Results..");
+        progressDialog.show();
         try {
             jsonArray = new JSONArray("["+result+"]");
 
@@ -169,31 +174,20 @@ public class ResultsActivity extends Activity {
             e.printStackTrace();
         }
 
-        BarDataSet bardataset = new BarDataSet(entries,null );
 
-
-        ArrayList<IBarDataSet> dataSets = new ArrayList<IBarDataSet>();
-        dataSets.add(bardataset);
-
-        BarData data = new BarData(dataSets);
-        barChart.setData(data);
-
-        // barChart.setDescription("Set Bar Chart Description");
-
-        bardataset.setColors(ColorTemplate.COLORFUL_COLORS);
-//        bardataset.setLabel("Vote");
 
         Legend l = barChart.getLegend();
         l.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
         l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.LEFT);
         l.setOrientation(Legend.LegendOrientation.HORIZONTAL);
         l.setDrawInside(false);
-        l.setForm(Legend.LegendForm.SQUARE);
+        l.setForm(Legend.LegendForm.CIRCLE);
         l.setFormSize(9f);
         l.setTextSize(11f);
         l.setXEntrySpace(4f);
 
         String[] es = new String[4];
+        List<String> label_xaxis = new ArrayList<String>();
 
         try {
             jsonArray = new JSONArray("["+result+"]");
@@ -204,7 +198,9 @@ public class ResultsActivity extends Activity {
                     JSONObject jsonObject = json.getJSONObject(j);
                     String res = jsonObject.getString("color");
                     es[j] = res;
+                    label_xaxis.add(res);
                     Log.i("ResultsActivity.class", "setChart: "+res);
+
                 }
 
             }
@@ -212,10 +208,13 @@ public class ResultsActivity extends Activity {
             e.printStackTrace();
         }
 
-        if(es != null){
-
-            l.setExtra(ColorTemplate.COLORFUL_COLORS, new String[]{ es[0],es[1],es[2],es[3]});
-            Log.i("ResultsActivity.class", "setChart: es "+es[0]);
+        if(es != null && es.length != 0){
+                progressDialog.dismiss();
+                l.setExtra(ColorTemplate.COLORFUL_COLORS, new String[]{es[0],es[1],es[2],es[3]});
+                Log.i("ResultsActivity.class", "setChart: es "+es[0]);
+        }else{
+            progressDialog.dismiss();
+            Log.i("ResultsActivity.class", "setChart: es fail"+es[0]);
         }
 
         XAxis xAxis = barChart.getXAxis();
@@ -233,11 +232,26 @@ public class ResultsActivity extends Activity {
         YAxis leftAxis = barChart.getAxisLeft();
         leftAxis.setTextColor(ColorTemplate.getHoloBlue());
         leftAxis.setAxisMinimum(0);
-        leftAxis.setDrawGridLines(false);
+        leftAxis.setDrawGridLines(true);
 
+        YAxis rightAxis = barChart.getAxisRight();
+        rightAxis.setEnabled(false);
 
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-        leftAxis.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART);
+//        leftAxis.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART);
+
+        BarDataSet bardataset = new BarDataSet(entries,null );
+
+        ArrayList<IBarDataSet> dataSets = new ArrayList<IBarDataSet>();
+        dataSets.add(bardataset);
+
+        BarData data = new BarData(dataSets);
+        barChart.setData(data);
+
+        // barChart.setDescription("Set Bar Chart Description");
+
+        bardataset.setColors(ColorTemplate.COLORFUL_COLORS);
+//        bardataset.setLabel("Vote");
 
         return "Success";
     }
