@@ -5,10 +5,8 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.os.StrictMode;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -32,19 +30,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 
@@ -58,11 +48,8 @@ public class ResultsActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_results);
 
-//        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-//        StrictMode.setThreadPolicy(policy);
-
         Log.i("ResultsActivity.class", "doInBackground: Results In Progress");
-        final String app_result;
+
         final List<String> stringList = new ArrayList<String>();
 
         final JSONArray jsonArray = new JSONArray();
@@ -88,9 +75,6 @@ public class ResultsActivity extends Activity {
 
                 for(String temp: items){
                     Log.i("ResultsActivity.class", "onDataChange: data is :"+ temp +" and frequency : "+ Collections.frequency(stringList,temp));
-//                        map_q.put("color",temp);
-
-//                        map_r.put(map_q,map);
                     try {
                         JSONObject jsonObject = new JSONObject();
                         jsonObject.put("color",temp);
@@ -123,21 +107,6 @@ public class ResultsActivity extends Activity {
             }
 
         });
-//        String app = jsonObject.toString();
-//        Log.i("ResultsActivity.class","JSONObj "+ app);
-//        try {
-//            jsonArray = new JSONArray("["+app+"]");
-//            Log.i("ResultsActivity.class","JSONArray "+ jsonArray);
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-//        String result =  results_ack();
-
-//        if (exp_res.isEmpty()){
-//            Toast.makeText(getApplicationContext(),"No Result",Toast.LENGTH_LONG).show();
-//        }else{
-//            Toast.makeText(getApplicationContext(),exp_res,Toast.LENGTH_LONG).show();
-//        }
 
         Button button = (Button)findViewById(R.id.refresh);
         button.setOnClickListener(new View.OnClickListener() {
@@ -155,12 +124,8 @@ public class ResultsActivity extends Activity {
         BarChart barChart = (BarChart) findViewById(R.id.barchart);
         ArrayList<BarEntry> entries = new ArrayList<>();
         JSONArray jsonArray = null;
-        progressDialog=new ProgressDialog(this);
-        progressDialog.setMessage("Loading Results..");
-        progressDialog.show();
         try {
             jsonArray = new JSONArray("["+result+"]");
-
             for (int i=0;i<jsonArray.length();i++){
                 JSONArray json = jsonArray.getJSONArray(i);
                 for(int j=0;j<json.length();j++){
@@ -209,11 +174,11 @@ public class ResultsActivity extends Activity {
         }
 
         if(es != null && es.length != 0){
-                progressDialog.dismiss();
+
                 l.setExtra(ColorTemplate.COLORFUL_COLORS, new String[]{es[0],es[1],es[2],es[3]});
                 Log.i("ResultsActivity.class", "setChart: es "+es[0]);
         }else{
-            progressDialog.dismiss();
+
             Log.i("ResultsActivity.class", "setChart: es fail"+es[0]);
         }
 
@@ -225,6 +190,7 @@ public class ResultsActivity extends Activity {
         xAxis.setEnabled(true);
         xAxis.disableGridDashedLine();
         xAxis.setDrawGridLines(false);
+
         xAxis.setAvoidFirstLastClipping(true);
         xAxis.setLabelCount(4);
         xAxis.setAxisMinimum(0);
@@ -242,6 +208,7 @@ public class ResultsActivity extends Activity {
 
         BarDataSet bardataset = new BarDataSet(entries,null );
 
+
         ArrayList<IBarDataSet> dataSets = new ArrayList<IBarDataSet>();
         dataSets.add(bardataset);
 
@@ -251,68 +218,9 @@ public class ResultsActivity extends Activity {
         // barChart.setDescription("Set Bar Chart Description");
 
         bardataset.setColors(ColorTemplate.COLORFUL_COLORS);
-//        bardataset.setLabel("Vote");
+        bardataset.setLabel("Vote");
+
 
         return "Success";
-    }
-
-
-    public String results_ack(){
-            Log.i("ResultsActivity.class", "doInBackground: Results In Progress");
-            final String app_result;
-            final List<String> stringList = new ArrayList<String>();
-            final JSONObject jsonObject = new JSONObject();
-             JSONArray jsonArray = null;
-//            databaseReference = FirebaseDatabase.getInstance().getReference();
-                databaseReference = FirebaseDatabase.getInstance().getReference("Voting");
-
-               databaseReference.addValueEventListener(new ValueEventListener() {
-
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-
-                   for(DataSnapshot ds : dataSnapshot.getChildren()){
-                        VoteInfo voteInfo =  new VoteInfo();
-                       Log.i("ResultsActivity.class", "onDataChange: "+ ds);
-                       voteInfo.setVote(ds.child("vote").getValue(String.class));
-                       String set_vote = voteInfo.getVote();
-                       stringList.add(set_vote);
-                       Log.i("ResultsActivity.class", "onDataChange Set: "+ set_vote);
-                   }
-                    Set<String> items = new HashSet<String>(stringList);
-                    HashMap<String,Integer> map = new HashMap<String, Integer>();
-                    HashMap<String,String> map_q = new HashMap<String, String>();
-
-                    for(String temp: items){
-                        Log.i("ResultsActivity.class", "onDataChange: data is :"+ temp +" and frequency : "+ Collections.frequency(stringList,temp));
-//                        map_q.put("color",temp);
-                        map.put(temp,Collections.frequency(stringList,temp));
-                        try {
-                            jsonObject.put("color",temp);
-                            jsonObject.put("count",""+Collections.frequency(stringList,temp)+"");
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-//                        map_r.put(map_q,map);
-                    }
-
-                    Log.i("ResultsActivity.class","Done "+ jsonObject);
-                    String app = jsonObject.toString();
-                    Log.i("ResultsActivity.class","JSONObj "+ app);
-                    try {
-                        JSONArray jsonArray = new JSONArray("["+app+"]");
-                        Log.i("ResultsActivity.class","JSONArray "+ jsonArray);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-
-            });
-
-        return null;
     }
 }
