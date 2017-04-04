@@ -67,11 +67,6 @@ public class MainActivity extends Activity {
         };
     }
 
-//    public void userLogin(View view){
-//        Intent intent = new Intent(this,Login.class);
-//        startActivity(intent);
-//    }
-
     @Override
     public void onStart() {
         super.onStart();
