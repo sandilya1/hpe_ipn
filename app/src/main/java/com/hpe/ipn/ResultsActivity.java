@@ -42,7 +42,6 @@ import java.util.Set;
 public class ResultsActivity extends Activity {
 
     DatabaseReference databaseReference;
-    ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +56,7 @@ public class ResultsActivity extends Activity {
 //            databaseReference = FirebaseDatabase.getInstance().getReference();
         databaseReference = FirebaseDatabase.getInstance().getReference("Voting");
 
-        databaseReference.addValueEventListener(new ValueEventListener() {
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
 
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -181,7 +180,7 @@ public class ResultsActivity extends Activity {
                 Log.i("ResultsActivity.class", "setChart: es "+es[0]);
         }else{
 
-            Log.i("ResultsActivity.class", "setChart: es fail"+es[0]);
+            Log.i("ResultsActivity.class", "setChart: es fail "+es[0]);
         }
 
         XAxis xAxis = barChart.getXAxis();
@@ -198,10 +197,7 @@ public class ResultsActivity extends Activity {
 
         YAxis leftAxis = barChart.getAxisLeft();
         leftAxis.setTextColor(ColorTemplate.getHoloBlue());
-
-        LargeValueFormatter y = new LargeValueFormatter();
-        leftAxis.setAxisMinimum(y.getDecimalDigits());
-
+        leftAxis.setAxisMinimum(0);
         leftAxis.setDrawGridLines(true);
 
         YAxis rightAxis = barChart.getAxisRight();

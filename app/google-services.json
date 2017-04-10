@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "352165933107",
+    "firebase_url": "https://hpe-ipn.firebaseio.com",
+    "project_id": "hpe-ipn",
+    "storage_bucket": "hpe-ipn.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:352165933107:android:b733e6f803a38981",
+        "android_client_info": {
+          "package_name": "com.hpe.ipn"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "352165933107-rec3lusbukol8779o9r6qeidb5q9b1o6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.hpe.ipn",
+            "certificate_hash": "357ad5c3dde5f7052eb37917f152c55df71c5d1a"
+          }
+        },
+        {
+          "client_id": "352165933107-epl1dvr1293s3rnk505c9dt30fiiqugj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAqZceox96XhERraqbJC6G4E3w9DA8XuoQ"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "352165933107-epl1dvr1293s3rnk505c9dt30fiiqugj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
