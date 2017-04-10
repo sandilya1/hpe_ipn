@@ -20,6 +20,7 @@ public class AdminActivity extends Activity {
     ExpandableListView expListView;
     List<String> listDataHeader;
     HashMap<String, List<String>> listDataChild;
+    int childList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
